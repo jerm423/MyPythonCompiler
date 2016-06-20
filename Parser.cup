@@ -1,0 +1,676 @@
+
+
+/* ---------------Seccion de declaraciones preliminares--------------------*/
+package pythoncompiler;
+
+/* Import the class java_cup.runtime.*  */
+import java_cup.runtime.*;
+import java.io.FileReader;
+import java.util.ArrayList;
+import pythoncompiler.utils.registers.*;
+
+/* Codigo del parser, se copia integramente a la clase final.
+    Agregamos el manejo de errores. */
+parser code {:
+
+
+
+    private static ArrayList<String> lex_error = new ArrayList<>();
+
+    /* Reporte de error encontrado. */
+    public void report_error(String message, Object info) {
+        StringBuilder m = new StringBuilder("ERROR");
+        if (info instanceof java_cup.runtime.Symbol) {
+            java_cup.runtime.Symbol s = ((java_cup.runtime.Symbol) info);
+            if (s.left >= 0) {
+                m.append(" in line "+(s.left+1));
+                if (s.right >= 0){
+                    m.append(", column "+(s.right+1));
+
+                    if (s.value == null) {
+                      if (s.sym == 2) {
+                        m.append(" : Lexical error (INVALID LIT)");
+
+                      }if (s.sym == 3) {
+                        m.append(" : Lexical error (INVALID ID)");
+
+                      }if (s.sym == 4){
+                        m.append(" : Lexical error (INVALID TOKEN)");
+
+                      }if (s.sym == 5) {
+                        m.append(" : Lexical error (INVALID CHARACTER )");
+                      }
+                    }
+                    System.err.println(m);
+                }
+            }
+        }else{
+          m.append(" : "+message);
+          System.err.println(m);
+        }
+
+    }
+
+    /* Cuando se encuentra un error de donde el sistema no puede
+        recuperarse, se lanza un error fatal. Se despliega el mensaje
+        de error y se finaliza la ejecucion. */
+    public void report_fatal_error(String message, Object info) {
+        report_error(message, info);
+        //System.exit(1);
+    }
+
+    /* Metodo main para garantizar la ejecucion del analizador
+       lexico y sintactico, ademas que se pase como parametro la tabla
+       de simbolos correspondiente. */
+    public static void main(String[] args){
+        try {
+            Parser asin = new Parser(
+                    new Lexer( new FileReader(args[0])));
+            Object result = asin.parse().value;
+            System.out.println("\n*** Resultados finales ***");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+:};
+
+
+
+/* ------------Declaracion de simbolos terminales y no terminales---------- */
+
+/* Terminales (tokens obtenidos por el analizador lexico).
+
+   Terminales que no tienen un valor son listados primero, los terminales que
+   tienen un valor como los enteros son listados en la segunda o demas lineas. */
+terminal      ERROR_LIT, ERROR_ID, ERROR_INV, ERROR_CHA, SEMICOLON_OP, BIT_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, 
+CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING,
+ TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT, TAB_OP, 
+ COMMA, RANGE, RETURN;
+
+
+/* No terminales usados en la seccion gramatical.
+
+   Primero se lista los no terminales que tienen un valor Object y despues
+   se lista los no terminales que tienen un entero. Un Object se refiere a que
+   no tienen tipo, pudiendo ser entero o String. */
+non terminal Object     program, def_func_stmt,  fun_stmt, fun_stmt_sec, fun_stmt_third, fun_stmt_fourth, fun_stmt2, class_stmt, class_stmt_sec, class_stmt_third, 
+class_stmt_fourth, list_var_decl, var_decl, 
+func_par, func_par_sec, block_stmt, list_block_stmt,
+ if_stmt, if_stmt_sec, if_stmt_third, if_stmt_fourth, if_stmt_fifth, if_stmt_sixth, elif_stmt, else_stmt, if_loop_stmt, elif_loop_stmt, else_loop_stmt, 
+ try_stmt, except_stmt, finally_stmt, try_loop_stmt, except_loop_stmt, finally_loop_stmt, 
+while_stmt, while_stmt_sec, while_stmt_third, while_stmt_fourth, for_stmt, for_param, logic_expr, min_expr, var_assing, list_var_assig, call_func_expr, 
+call_func_expr2, par_expr, expr, arith_expr, list_arg, 
+print_stmt, input_stmt, input_stmt2, range_stmt, range_values, list_loop_block_stmt, loop_block_stmt, base_block_stmt, bracket_expr, return_stmt ,type_decl, 
+id_list, id_list_sec, test1, test2, test3 ;
+
+
+  /*----------------------------------PROGRAM STATEMEN----------------------------------*/
+  program       ::= class_stmt list_block_stmt {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    class_stmt {://System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    def_func_stmt list_var_decl list_block_stmt {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    def_func_stmt list_var_decl {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    def_func_stmt list_block_stmt {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    def_func_stmt {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    list_var_decl list_block_stmt {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    list_var_decl {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    list_block_stmt {: //System.err.println(" Parser Completed!! \n");
+                    :}
+                    |
+                    def_func_stmt list_var_decl error {:System.err.println(" STRUCTURE ERROR \n");:}
+                    |
+                    def_func_stmt list_block_stmt error {:System.err.println(" STRUCTURE ERROR \n");:}
+                    |
+                    list_var_decl list_block_stmt error {:System.err.println(" STRUCTURE ERROR \n");:}
+                    |
+                    list_var_decl error {:System.err.println(" STRUCTURE ERROR \n");:}
+                    |
+                    list_block_stmt error {:System.err.println(" STRUCTURE ERROR \n");:}
+
+                    ;
+
+  /*----------------------------------CLASS STATEMEN----------------------------------*/
+  
+  class_stmt    ::= CLASS IDENTIFIER COLON_OP list_var_decl def_func_stmt SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP list_var_decl SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP def_func_stmt SEMICOLON_OP
+                    |
+                    CLASS IDENTIFIER COLON_OP SEMICOLON_OP
+                    ;
+
+
+  /*----------------------------------FUNCTION STATEMEN----------------------------------*/
+  def_func_stmt ::= def_func_stmt fun_stmt
+                    |
+                    fun_stmt
+                    ;
+/*
+  fun_stmt      ::= DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_var_decl list_block_stmt SEMICOLON_OP
+                    |
+                    DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_var_decl SEMICOLON_OP
+                    |
+                    DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP SEMICOLON_OP
+                    |
+                    DEF error {:System.err.println(" Error FUNCTION STATEMEN \n");:} SEMICOLON_OP
+                    ;
+*/
+
+
+
+fun_stmt        ::= DEF {: //SemanticActions.testAction("El DEF de la funcion"); 
+                        :} fun_stmt_sec;                 
+
+fun_stmt_sec    ::= IDENTIFIER fun_stmt_third
+                    |
+                    error {:System.err.println(" Error FUNCTION STATEMEN \n");:} SEMICOLON_OP
+                    ;
+
+fun_stmt_third  ::= L_PARENTHESIS_OP fun_stmt2 COLON_OP fun_stmt_fourth;
+
+
+fun_stmt_fourth ::= list_var_decl list_block_stmt SEMICOLON_OP
+                    |
+                    list_block_stmt SEMICOLON_OP
+                    |
+                    SEMICOLON_OP
+                    ;
+
+  fun_stmt2     ::= func_par R_PARENTHESIS_OP
+                    |
+                    R_PARENTHESIS_OP
+                    |
+                    error {:System.err.println(" Missing : ) \n");:}
+                    ;
+
+  /*----------------------------------FUNCTION PARAMETER----------------------------------*/
+
+  func_par      ::= func_par COMMA type_decl IDENTIFIER
+                    |
+                    func_par_sec
+                    ;
+
+
+func_par_sec    ::= type_decl IDENTIFIER
+                    |
+                    error {:System.err.println(" Error FUNCTION PARAMETER \n");:}
+                    ;
+
+  /*----------------------------------VARIABLE ASSIGNATION----------------------------------*/
+
+  list_var_assig::= list_var_assig var_assing
+                    |
+                    var_assing
+                    ;
+
+/*
+  var_assing    ::= IDENTIFIER ASSIG_OP expr
+                    |
+                    IDENTIFIER error {:System.err.println(" Missing : = on Variable assig  \n");:} expr
+                    ;
+*/
+
+
+var_assing    ::=   IDENTIFIER:id ASSIG_OP:equ{: 
+                        Symbol symbol = new Symbol(sym.IDENTIFIER, idleft, idright, id);
+                        SemanticActions.registerVariable(symbol);
+
+                        Symbol symbol2 = new Symbol(sym.ASSIG_OP, equleft, equright, equ);
+                        SemanticActions.registerOperator(symbol2);
+                    :} expr
+                    |
+                    IDENTIFIER error {:System.err.println(" Missing : = on Variable assig  \n");:} expr
+                    ;
+
+
+
+
+  /*----------------------------------VARIABLE DECLARATION----------------------------------*/
+
+
+  list_var_decl ::= list_var_decl var_decl
+                    |
+                    var_decl
+                    ;
+
+  var_decl      ::= type_decl id_list {: SemanticActions.insertSymbols(); :}
+                     ;
+
+  type_decl     ::= TYPE_INT:typ 
+                    {: 
+                        Symbol symbol = new Symbol(sym.TYPE_INT, typleft, typright, typ);
+                        SemanticActions.rememberType(symbol);
+                        //SemanticActions.testProduction(symbol);
+                        
+                    :}
+                    
+                    |
+
+                    TYPE_FLOAT:typ 
+                    {: 
+                        Symbol symbol = new Symbol(sym.TYPE_FLOAT, typleft, typright, typ);
+                        SemanticActions.rememberType(symbol);
+                    :}
+
+                    |
+
+                    TYPE_LIST:typ
+                    {: 
+                        Symbol symbol = new Symbol(sym.TYPE_LIST, typleft, typright, typ);
+                        SemanticActions.rememberType(symbol);
+                    :}
+
+                    |
+
+                    TYPE_STRING:typ
+                    {: 
+                        Symbol symbol = new Symbol(sym.TYPE_STRING, typleft, typright, typ);
+                        SemanticActions.rememberType(symbol);
+                    :}
+
+                    |
+
+                    TYPE_BOOLEAN:typ
+                    {: 
+                        Symbol symbol = new Symbol(sym.TYPE_BOOLEAN, typleft, typright, typ);
+                        SemanticActions.rememberType(symbol);
+                    :}
+
+                    |
+                    TYPE_CHAR:typ 
+                    {: 
+                        Symbol symbol = new Symbol(sym.TYPE_CHAR, typleft, typright, typ);
+                        SemanticActions.rememberType(symbol);
+                    :}
+                    
+                    |
+
+                    error {::}
+                    ;
+
+  id_list       ::= id_list COMMA IDENTIFIER:id
+                    {: 
+                        Symbol symbol = new Symbol(sym.IDENTIFIER, idleft, idright, id);
+                        SemanticActions.rememberIdentifier(symbol);
+                    :}
+
+                    |
+                    id_list_sec
+                    
+                    ;
+
+
+id_list_sec     ::= IDENTIFIER:id
+                    {: 
+                        Symbol symbol = new Symbol(sym.IDENTIFIER, idleft, idright, id);
+                        SemanticActions.rememberIdentifier(symbol);
+                    :}
+                    ;
+
+
+
+  /*----------------------------------EXPRESSION STATEMEN----------------------------------*/
+  expr          ::= arith_expr
+
+                    ;
+
+  arith_expr    ::= expr ARITH_OP:ope
+                    {: 
+                        Symbol symbol = new Symbol(sym.ARITH_OP, opeleft, operight, ope);
+                        SemanticActions.registerOperator(symbol);
+                    :}  logic_expr
+                    |
+                    expr ASSIG_OP:ope
+                    {: 
+                        Symbol symbol = new Symbol(sym.ASSIG_OP, opeleft, operight, ope);
+                        SemanticActions.registerOperator(symbol);
+                    :} logic_expr
+                    |
+                    logic_expr
+                    ;
+
+  logic_expr    ::= logic_expr COMP_OP par_expr
+                    |
+                    logic_expr LOGICAL_OP par_expr
+                    |
+                    logic_expr BIT_OP par_expr
+                    |
+                    bracket_expr
+                    |
+                    call_func_expr
+                    ;
+
+bracket_expr    ::= L_BRACKET_OP list_arg R_BRACKET_OP
+                    |
+                    par_expr
+                    ;
+
+  par_expr      ::= L_PARENTHESIS_OP list_arg R_PARENTHESIS_OP
+                    |
+                    min_expr
+                    ;
+
+  min_expr      ::= IDENTIFIER:ide
+                    {: 
+                        Symbol symbol = new Symbol(sym.IDENTIFIER, ideleft, ideright, ide);
+                        //SemanticActions.testProduction(symbol);
+                        SemanticActions.registerVariable(symbol);
+                        
+                    :}
+                    |
+                    NUM_LIT:nl 
+                    {: 
+                        Symbol symbol = new Symbol(sym.NUM_LIT, nlleft, nlright, nl);
+                        SemanticActions.registerLiteral(symbol);
+                    :}
+                    |
+                    STRING_LIT:sl
+                    {: 
+                        Symbol symbol = new Symbol(sym.NUM_LIT, slleft, slright, sl);
+                        SemanticActions.registerLiteral(symbol);
+                    :}
+                    |
+                    CHAR_LIT:cl
+                    {: 
+                        Symbol symbol = new Symbol(sym.NUM_LIT, clleft, clright, cl);
+                        SemanticActions.registerLiteral(symbol);
+                    :}
+                    |
+                    BOOLEAN_LIT:bl
+                    {: 
+                        Symbol symbol = new Symbol(sym.NUM_LIT, blleft, blright, bl);
+                        SemanticActions.registerLiteral(symbol);
+                    :}
+                    |
+                    error {:System.err.println(" Error INVALID EXPRESSION!! \n");:}
+                    ;
+
+
+call_func_expr  ::= IDENTIFIER L_PARENTHESIS_OP call_func_expr2
+                    |
+                    IDENTIFIER PROPERTY_OP IDENTIFIER L_PARENTHESIS_OP call_func_expr2
+                    ;
+
+
+call_func_expr2 ::= list_arg R_PARENTHESIS_OP
+                    |
+                    R_PARENTHESIS_OP
+                    ;
+
+  /*----------------------------------ARGUMENT LIST STATEMEN----------------------------------*/
+
+  list_arg      ::= list_arg COMMA expr
+                    |
+                    list_arg error {:System.err.println(" Missing: , \n");:} expr
+                    |
+                    expr
+                    ;
+
+
+/*------------------------------------------CONTROL STRUCTURES------------------------------------------*/
+
+/*----------------------------------IF LOOP STATEMENT----------------------------------*/
+  if_loop_stmt  ::= IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP elif_loop_stmt else_loop_stmt
+                    |
+                    IF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP else_loop_stmt
+                    |
+                    IF logic_expr error {:System.err.println(" Error IF Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+/*----------------------------------ELIF LOOP STATEMENT----------------------------------*/
+  elif_loop_stmt     ::= elif_loop_stmt ELIF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr error {:System.err.println(" Error ELIF Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+/*----------------------------------ELSE LOOP STATEMENT----------------------------------*/
+
+  else_loop_stmt     ::= ELSE COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    ELSE error {:System.err.println(" Error ELSE Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+
+/*----------------------------------IF STATEMENT----------------------------------*/
+
+  if_stmt       ::= IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP elif_stmt else_stmt
+                    |
+                    IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP else_stmt
+                    |
+                    IF logic_expr error {:System.err.println(" Error IF Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+
+
+/*
+if_stmt         ::= IF if_stmt_sec;
+
+
+if_stmt_sec     ::= logic_expr if_stmt_third;
+
+if_stmt_third   ::= COLON_OP if_stmt_fourth
+                    |
+                    error {:System.err.println(" Error IF Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+if_stmt_fourth  ::= list_block_stmt if_stmt_fifth
+                    ;
+
+if_stmt_fifth   ::= SEMICOLON_OP if_stmt_sixth;
+
+if_stmt_sixth   ::= elif_stmt else_stmt
+                    |
+                    else_stmt;
+
+*/
+
+/*----------------------------------ELIF STATEMENT----------------------------------*/
+  elif_stmt     ::= elif_stmt ELIF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    ELIF logic_expr error {:System.err.println(" Error ELIF Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+/*----------------------------------ELSE STATEMENT----------------------------------*/
+
+  else_stmt     ::= ELSE COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    ELSE error {:System.err.println(" Error ELSE Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+
+/*----------------------------------TRY STATEMENT----------------------------------*/
+
+  try_loop_stmt    ::= TRY COLON_OP list_loop_block_stmt SEMICOLON_OP except_loop_stmt
+                    |
+                    TRY error {:System.err.println(" Error TRY Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+  except_loop_stmt ::= EXCEPT IDENTIFIER COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    EXCEPT IDENTIFIER COLON_OP list_loop_block_stmt SEMICOLON_OP finally_loop_stmt
+                    |
+                    EXCEPT error {:System.err.println(" Error EXCEPT Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+  finally_loop_stmt::= FINALLY COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    FINALLY error {:System.err.println(" Error FINALLY Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+
+
+  try_stmt      ::= TRY COLON_OP list_block_stmt SEMICOLON_OP except_stmt
+                    |
+                    TRY error {:System.err.println(" Error TRY Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+  except_stmt   ::= EXCEPT IDENTIFIER COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    EXCEPT IDENTIFIER COLON_OP list_block_stmt SEMICOLON_OP finally_stmt
+                    |
+                    EXCEPT error {:System.err.println(" Error EXCEPT Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+  finally_stmt  ::= FINALLY COLON_OP list_block_stmt SEMICOLON_OP
+                    |
+                    FINALLY error {:System.err.println(" Error FINALLY Stmt!! \n");:} SEMICOLON_OP
+                    ;
+/*----------------------------------WHILE STATEMENT----------------------------------*/
+/*
+  while_stmt    ::= WHILE logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    WHILE error {:System.err.println(" Error WHILE Stmt!! \n");:} SEMICOLON_OP
+                    ;
+*/
+
+
+while_stmt      ::= WHILE:wh
+                    {: 
+                        Symbol symbol = new Symbol(sym.WHILE, whleft, whright, wh);
+                        SemanticActions.startWhile(symbol);
+                    :}
+                     while_stmt_sec
+                     ;
+
+
+while_stmt_sec  ::= logic_expr while_stmt_third
+                    |
+                    error {:System.err.println(" Error WHILE Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+while_stmt_third    ::= COLON_OP while_stmt_fourth;
+
+while_stmt_fourth   ::= list_loop_block_stmt SEMICOLON_OP;
+
+/*----------------------------------FOR STATEMENT----------------------------------*/
+  for_stmt      ::= FOR IDENTIFIER IN range_stmt  COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    FOR IDENTIFIER IN bracket_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    |
+                    FOR error {:System.err.println(" Error FOR Stmt!! \n");:} SEMICOLON_OP
+                    ;
+
+  for_param     ::= L_PARENTHESIS_OP list_arg R_PARENTHESIS_OP
+                    |
+                    L_BRACKET_OP list_arg R_BRACKET_OP
+                    |
+                    IDENTIFIER
+                    |
+                    STRING_LIT
+                    |
+                    error {:System.err.println(" Error FOR Stmt!! \n");:}
+                    ;
+
+  range_stmt    ::= RANGE L_PARENTHESIS_OP range_values R_PARENTHESIS_OP
+                    |
+                    RANGE L_PARENTHESIS_OP range_values COMMA range_values R_PARENTHESIS_OP
+                    |
+                    RANGE L_PARENTHESIS_OP range_values COMMA range_values COMMA range_values R_PARENTHESIS_OP
+                    |
+                    RANGE error {:System.err.println(" Error RANGE Stmt!! \n");:}
+                    ;
+  range_values  ::= IDENTIFIER
+                    |
+                    NUM_LIT
+                    ;
+
+/*----------------------------------PRINT STATEMENT----------------------------------*/
+  print_stmt    ::= PRINT L_PARENTHESIS_OP list_arg R_PARENTHESIS_OP
+                    |
+                    PRINT L_PARENTHESIS_OP R_PARENTHESIS_OP
+                    |
+                    PRINT error {:System.err.println(" Error Print Stmt!! \n");:} list_arg R_PARENTHESIS_OP
+                    ;
+
+/*----------------------------------INPUT STATEMENT----------------------------------*/
+  input_stmt    ::= IDENTIFIER ASSIG_OP INPUT L_PARENTHESIS_OP input_stmt2
+                    |
+                    INPUT L_PARENTHESIS_OP input_stmt2
+                    |
+                    INPUT error {:System.err.println(" Error INPUT Stmt!! \n");:}
+
+                    ;
+
+  input_stmt2   ::= expr R_PARENTHESIS_OP
+                    |
+                    R_PARENTHESIS_OP
+                    |
+                    error {:System.err.println(" Error INPUT Stmt!! \n");:}
+                    ;
+
+/*----------------------------------RETURN STATEMENT----------------------------------*/
+
+return_stmt     ::= RETURN expr
+                    ;
+
+/*----------------------------------BLOCK STATEMENT----------------------------------*/
+  list_block_stmt::= list_block_stmt block_stmt
+                      |
+                      block_stmt
+                      ;
+
+
+  list_loop_block_stmt::= list_loop_block_stmt loop_block_stmt
+                          |
+                          loop_block_stmt
+                          ;
+
+  loop_block_stmt::= BREAK
+                    |
+                    CONTINUE
+                    |
+                    if_loop_stmt
+                    |
+                    try_loop_stmt
+                    |
+                    base_block_stmt
+
+                    ;
+
+  block_stmt    ::= if_stmt
+                    |
+                    try_stmt
+                    |
+                    base_block_stmt
+                    ;
+
+  base_block_stmt ::=while_stmt
+                    |
+                    for_stmt
+                    |
+                    call_func_expr
+                    |
+                    var_assing
+                    |
+                    print_stmt
+                    |
+                    input_stmt
+                    |
+                    return_stmt
+                    ;
