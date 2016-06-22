@@ -1,1 +1,0 @@
-scanner.semantic.SymbolTable.Symbol_Var

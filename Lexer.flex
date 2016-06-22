@@ -158,7 +158,31 @@ INVALID_LITERAL         = {INVALID_STR_LIT} | {INVALID_CHAR_LIT} |{NUM_LIT}({EXP
     {R_BRACKET_OP}          { return symbol(sym.R_BRACKET_OP, yytext()); }
 
     {CHAR_LIT}              { return symbol(sym.CHAR_LIT, new String(yytext())); }
-    {NUM_LIT}               { return symbol(sym.NUM_LIT, new Integer(yytext())); }
+
+    {NUM_LIT}               { 
+
+                                if(SemanticActions.isInteger(yytext())){
+                                    //System.out.println("ES ENTEROOO");
+                                    return symbol(sym.NUM_LIT, new Integer(yytext())); 
+                                }
+                                else{
+
+                                    if(SemanticActions.isFloat(yytext())){
+                                        //System.out.println("ES FLOAT");
+                                        return symbol(sym.NUM_LIT, new Float(yytext())); 
+                                    }
+                                    else{
+                                        System.out.println("ES IMAGINARIO");
+                                    }
+                                    
+                                }
+
+                                
+
+                            }
+
+
+
     {STRING_LIT}            { return symbol(sym.STRING_LIT, new String(yytext())); }
     {BOOLEAN_LIT}           { return symbol(sym.BOOLEAN_LIT, new Boolean(yytext())); }
     "and"                   { return symbol(sym.AND, yytext()); }

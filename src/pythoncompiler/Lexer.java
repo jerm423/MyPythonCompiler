@@ -981,7 +981,21 @@ class Lexer implements java_cup.runtime.Scanner {
             }
           case 64: break;
           case 17: 
-            { return symbol(sym.NUM_LIT, new Integer(yytext()));
+            { if(SemanticActions.isInteger(yytext())){
+                                    //System.out.println("ES ENTEROOO");
+                                    return symbol(sym.NUM_LIT, new Integer(yytext())); 
+                                }
+                                else{
+
+                                    if(SemanticActions.isFloat(yytext())){
+                                        //System.out.println("ES FLOAT");
+                                        return symbol(sym.NUM_LIT, new Float(yytext())); 
+                                    }
+                                    else{
+                                        System.out.println("ES IMAGINARIO");
+                                    }
+                                    
+                                }
             }
           case 65: break;
           case 18: 

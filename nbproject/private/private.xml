@@ -3,11 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Joseph/Desktop/PythonSemantic/src/pythoncompiler/SemanticActions.java</file>
-            <file>file:/C:/Users/Joseph/Desktop/PythonSemantic/src/pythoncompiler/utils/Errors.java</file>
-            <file>file:/C:/Users/Joseph/Desktop/PythonSemantic/src/pythoncompiler/Main.java</file>
-            <file>file:/C:/Users/Joseph/Desktop/PythonSemantic/src/pythoncompiler/utils/SymbolTable.java</file>
-            <file>file:/C:/Users/Joseph/Desktop/PythonSemantic/src/pythoncompiler/utils/SemanticStack.java</file>
+            <file>file:/C:/Users/Joseph/Desktop/MyPythonCompiler/src/pythoncompiler/utils/registers/SemanticRegister.java</file>
+            <file>file:/C:/Users/Joseph/Desktop/MyPythonCompiler/src/pythoncompiler/SemanticActions.java</file>
+            <file>file:/C:/Users/Joseph/Desktop/MyPythonCompiler/src/pythoncompiler/Main.java</file>
+            <file>file:/C:/Users/Joseph/Desktop/MyPythonCompiler/src/pythoncompiler/utils/SemanticStack.java</file>
+            <file>file:/C:/Users/Joseph/Desktop/MyPythonCompiler/src/pythoncompiler/utils/registers/SR_DO.java</file>
         </group>
     </open-files>
 </project-private>

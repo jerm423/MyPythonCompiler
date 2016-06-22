@@ -13,11 +13,13 @@ import java_cup.runtime.Symbol;
  */
 public class SR_DO extends SemanticRegister {
     
-    private String _type, _value;
+    private String _type, _value, _category;
+    
+    private Symbol _Symbol;
     
     public SR_DO(Symbol pSymbol){
         super(pSymbol, "SR_DO", pSymbol.value.toString());
-        
+        _Symbol = pSymbol;
         
     }
 
@@ -35,6 +37,18 @@ public class SR_DO extends SemanticRegister {
 
     public void setValue(String _value) {
         this._value = _value;
+    }
+
+    public String getCategory() {
+        return _category;
+    }
+
+    public void setCategory(String _category) {
+        this._category = _category;
+    }
+
+    public Symbol getSymbol() {
+        return _Symbol;
     }
 
     

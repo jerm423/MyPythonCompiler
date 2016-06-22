@@ -7,15 +7,13 @@ package pythoncompiler;
 import java_cup.runtime.*;
 import java.io.FileReader;
 import java.util.ArrayList;
-import pythoncompiler.utils.registers.*;
 
 /* Codigo del parser, se copia integramente a la clase final.
     Agregamos el manejo de errores. */
 parser code {:
 
-
-
     private static ArrayList<String> lex_error = new ArrayList<>();
+
 
     /* Reporte de error encontrado. */
     public void report_error(String message, Object info) {
@@ -82,10 +80,7 @@ parser code {:
 
    Terminales que no tienen un valor son listados primero, los terminales que
    tienen un valor como los enteros son listados en la segunda o demas lineas. */
-terminal      ERROR_LIT, ERROR_ID, ERROR_INV, ERROR_CHA, SEMICOLON_OP, BIT_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, 
-CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING,
- TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT, TAB_OP, 
- COMMA, RANGE, RETURN;
+terminal      ERROR_LIT, ERROR_ID, ERROR_INV, ERROR_CHA, SEMICOLON_OP, BIT_OP, ARITH_OP, L_PARENTHESIS_OP, R_PARENTHESIS_OP, NUM_LIT, AND, BREAK, CLASS, CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRINT, TRY, WHILE, TYPE_LIST, TYPE_INT, TYPE_FLOAT, TYPE_CHAR, TYPE_STRING, TYPE_BOOLEAN, COMP_OP, ASSIG_OP, LOGICAL_OP, PROPERTY_OP, COLON_OP, IDENTIFIER, L_BRACKET_OP, R_BRACKET_OP, BOOLEAN_LIT, CHAR_LIT, STRING_LIT, TAB_OP, COMMA, RANGE, RETURN;
 
 
 /* No terminales usados en la seccion gramatical.
@@ -93,44 +88,27 @@ CONTINUE, DEF, ELIF, ELSE, EXCEPT, FINALLY, FOR, IF, IN, INPUT, IS_NOT, OR, PRIN
    Primero se lista los no terminales que tienen un valor Object y despues
    se lista los no terminales que tienen un entero. Un Object se refiere a que
    no tienen tipo, pudiendo ser entero o String. */
-non terminal Object     program, def_func_stmt,  fun_stmt, fun_stmt_sec, fun_stmt_third, fun_stmt_fourth, fun_stmt2, class_stmt, class_stmt_sec, class_stmt_third, 
-class_stmt_fourth, list_var_decl, var_decl, 
-func_par, func_par_sec, block_stmt, list_block_stmt,
- if_stmt, if_stmt_sec, if_stmt_third, if_stmt_fourth, if_stmt_fifth, if_stmt_sixth, elif_stmt, else_stmt, if_loop_stmt, elif_loop_stmt, else_loop_stmt, 
- try_stmt, except_stmt, finally_stmt, try_loop_stmt, except_loop_stmt, finally_loop_stmt, 
-while_stmt, while_stmt_sec, while_stmt_third, while_stmt_fourth, for_stmt, for_param, logic_expr, min_expr, var_assing, list_var_assig, call_func_expr, 
-call_func_expr2, par_expr, expr, arith_expr, list_arg, 
-print_stmt, input_stmt, input_stmt2, range_stmt, range_values, list_loop_block_stmt, loop_block_stmt, base_block_stmt, bracket_expr, return_stmt ,type_decl, 
-id_list, id_list_sec, test1, test2, test3 ;
+non terminal Object     program, def_func_stmt, func_par_sec, func_par_type_decl, id_list_sec, fun_stmt, fun_stmt2, class_stmt , list_var_decl, var_decl, func_par, block_stmt, list_block_stmt, if_stmt, elif_stmt, else_stmt, if_loop_stmt, elif_loop_stmt, else_loop_stmt, try_stmt, except_stmt, finally_stmt, try_loop_stmt, except_loop_stmt, finally_loop_stmt, while_stmt, for_stmt, for_param, logic_expr, min_expr, var_assing, list_var_assig, call_func_expr, call_func_expr2, par_expr, expr, arith_expr, list_arg, print_stmt, input_stmt, input_stmt2, range_stmt, range_values, list_loop_block_stmt, loop_block_stmt, base_block_stmt, bracket_expr, return_stmt ,type_decl, id_list, test1, test2, test3 ,beacket_expr;
 
 
   /*----------------------------------PROGRAM STATEMEN----------------------------------*/
-  program       ::= class_stmt list_block_stmt {: //System.err.println(" Parser Completed!! \n");
-                    :}
+  program       ::= class_stmt list_block_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    class_stmt {://System.err.println(" Parser Completed!! \n");
-                    :}
+                    class_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    def_func_stmt list_var_decl list_block_stmt {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    def_func_stmt list_var_decl list_block_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    def_func_stmt list_var_decl {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    def_func_stmt list_var_decl {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    def_func_stmt list_block_stmt {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    def_func_stmt list_block_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    def_func_stmt {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    def_func_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    list_var_decl list_block_stmt {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    list_var_decl list_block_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    list_var_decl {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    list_var_decl {:System.err.println(" Parser Completed!! \n");:}
                     |
-                    list_block_stmt {: //System.err.println(" Parser Completed!! \n");
-                    :}
+                    list_block_stmt {:System.err.println(" Parser Completed!! \n");:}
                     |
                     def_func_stmt list_var_decl error {:System.err.println(" STRUCTURE ERROR \n");:}
                     |
@@ -145,7 +123,6 @@ id_list, id_list_sec, test1, test2, test3 ;
                     ;
 
   /*----------------------------------CLASS STATEMEN----------------------------------*/
-  
   class_stmt    ::= CLASS IDENTIFIER COLON_OP list_var_decl def_func_stmt SEMICOLON_OP
                     |
                     CLASS IDENTIFIER COLON_OP list_var_decl SEMICOLON_OP
@@ -161,7 +138,7 @@ id_list, id_list_sec, test1, test2, test3 ;
                     |
                     fun_stmt
                     ;
-/*
+
   fun_stmt      ::= DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_var_decl list_block_stmt SEMICOLON_OP
                     |
                     DEF IDENTIFIER L_PARENTHESIS_OP fun_stmt2 COLON_OP list_var_decl SEMICOLON_OP
@@ -172,27 +149,7 @@ id_list, id_list_sec, test1, test2, test3 ;
                     |
                     DEF error {:System.err.println(" Error FUNCTION STATEMEN \n");:} SEMICOLON_OP
                     ;
-*/
 
-
-
-fun_stmt        ::= DEF {: //SemanticActions.testAction("El DEF de la funcion"); 
-                        :} fun_stmt_sec;                 
-
-fun_stmt_sec    ::= IDENTIFIER fun_stmt_third
-                    |
-                    error {:System.err.println(" Error FUNCTION STATEMEN \n");:} SEMICOLON_OP
-                    ;
-
-fun_stmt_third  ::= L_PARENTHESIS_OP fun_stmt2 COLON_OP fun_stmt_fourth;
-
-
-fun_stmt_fourth ::= list_var_decl list_block_stmt SEMICOLON_OP
-                    |
-                    list_block_stmt SEMICOLON_OP
-                    |
-                    SEMICOLON_OP
-                    ;
 
   fun_stmt2     ::= func_par R_PARENTHESIS_OP
                     |
@@ -203,15 +160,44 @@ fun_stmt_fourth ::= list_var_decl list_block_stmt SEMICOLON_OP
 
   /*----------------------------------FUNCTION PARAMETER----------------------------------*/
 
-  func_par      ::= func_par COMMA type_decl IDENTIFIER
+  func_par      ::= func_par COMMA func_par_type_decl IDENTIFIER
                     |
                     func_par_sec
+                    |
+                    error {:System.err.println(" Error FUNCTION PARAMETER \n");:}
                     ;
 
 
-func_par_sec    ::= type_decl IDENTIFIER
+func_par_sec    ::= func_par_type_decl IDENTIFIER
+                    ;
+
+
+func_par_type_decl ::= 
+
+                    TYPE_INT
+                    
                     |
-                    error {:System.err.println(" Error FUNCTION PARAMETER \n");:}
+
+                    TYPE_FLOAT
+
+                    |
+
+                    TYPE_LIST
+
+                    |
+
+                    TYPE_STRING
+
+                    |
+
+                    TYPE_BOOLEAN
+
+                    |
+                    TYPE_CHAR
+                    
+                    |
+
+                    error {::}
                     ;
 
   /*----------------------------------VARIABLE ASSIGNATION----------------------------------*/
@@ -221,27 +207,18 @@ func_par_sec    ::= type_decl IDENTIFIER
                     var_assing
                     ;
 
-/*
-  var_assing    ::= IDENTIFIER ASSIG_OP expr
-                    |
-                    IDENTIFIER error {:System.err.println(" Missing : = on Variable assig  \n");:} expr
-                    ;
-*/
-
-
-var_assing    ::=   IDENTIFIER:id ASSIG_OP:equ{: 
+  var_assing    ::= IDENTIFIER:id ASSIG_OP:equ{: 
                         Symbol symbol = new Symbol(sym.IDENTIFIER, idleft, idright, id);
                         SemanticActions.registerVariable(symbol);
 
                         Symbol symbol2 = new Symbol(sym.ASSIG_OP, equleft, equright, equ);
                         SemanticActions.registerOperator(symbol2);
-                    :} expr
+
+
+                    :} expr {: /*SemanticActions.evalAssign();*/ :}
                     |
                     IDENTIFIER error {:System.err.println(" Missing : = on Variable assig  \n");:} expr
                     ;
-
-
-
 
   /*----------------------------------VARIABLE DECLARATION----------------------------------*/
 
@@ -254,7 +231,7 @@ var_assing    ::=   IDENTIFIER:id ASSIG_OP:equ{:
   var_decl      ::= type_decl id_list {: SemanticActions.insertSymbols(); :}
                      ;
 
-  type_decl     ::= TYPE_INT:typ 
+type_decl     ::= TYPE_INT:typ 
                     {: 
                         Symbol symbol = new Symbol(sym.TYPE_INT, typleft, typright, typ);
                         SemanticActions.rememberType(symbol);
@@ -311,12 +288,9 @@ var_assing    ::=   IDENTIFIER:id ASSIG_OP:equ{:
                         Symbol symbol = new Symbol(sym.IDENTIFIER, idleft, idright, id);
                         SemanticActions.rememberIdentifier(symbol);
                     :}
-
                     |
                     id_list_sec
-                    
                     ;
-
 
 id_list_sec     ::= IDENTIFIER:id
                     {: 
@@ -328,21 +302,13 @@ id_list_sec     ::= IDENTIFIER:id
 
 
   /*----------------------------------EXPRESSION STATEMEN----------------------------------*/
-  expr          ::= arith_expr
+  expr          ::= arith_expr {: SemanticActions.evalBinary(); :}
 
                     ;
 
-  arith_expr    ::= expr ARITH_OP:ope
-                    {: 
-                        Symbol symbol = new Symbol(sym.ARITH_OP, opeleft, operight, ope);
-                        SemanticActions.registerOperator(symbol);
-                    :}  logic_expr
+  arith_expr    ::= expr ARITH_OP logic_expr
                     |
-                    expr ASSIG_OP:ope
-                    {: 
-                        Symbol symbol = new Symbol(sym.ASSIG_OP, opeleft, operight, ope);
-                        SemanticActions.registerOperator(symbol);
-                    :} logic_expr
+                    expr ASSIG_OP logic_expr
                     |
                     logic_expr
                     ;
@@ -353,12 +319,12 @@ id_list_sec     ::= IDENTIFIER:id
                     |
                     logic_expr BIT_OP par_expr
                     |
-                    bracket_expr
+                    beacket_expr
                     |
                     call_func_expr
                     ;
 
-bracket_expr    ::= L_BRACKET_OP list_arg R_BRACKET_OP
+beacket_expr    ::= L_BRACKET_OP list_arg R_BRACKET_OP
                     |
                     par_expr
                     ;
@@ -454,7 +420,6 @@ call_func_expr2 ::= list_arg R_PARENTHESIS_OP
 
 
 /*----------------------------------IF STATEMENT----------------------------------*/
-
   if_stmt       ::= IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
                     |
                     IF logic_expr COLON_OP list_block_stmt SEMICOLON_OP elif_stmt else_stmt
@@ -463,30 +428,6 @@ call_func_expr2 ::= list_arg R_PARENTHESIS_OP
                     |
                     IF logic_expr error {:System.err.println(" Error IF Stmt!! \n");:} SEMICOLON_OP
                     ;
-
-
-
-/*
-if_stmt         ::= IF if_stmt_sec;
-
-
-if_stmt_sec     ::= logic_expr if_stmt_third;
-
-if_stmt_third   ::= COLON_OP if_stmt_fourth
-                    |
-                    error {:System.err.println(" Error IF Stmt!! \n");:} SEMICOLON_OP
-                    ;
-
-if_stmt_fourth  ::= list_block_stmt if_stmt_fifth
-                    ;
-
-if_stmt_fifth   ::= SEMICOLON_OP if_stmt_sixth;
-
-if_stmt_sixth   ::= elif_stmt else_stmt
-                    |
-                    else_stmt;
-
-*/
 
 /*----------------------------------ELIF STATEMENT----------------------------------*/
   elif_stmt     ::= elif_stmt ELIF logic_expr COLON_OP list_block_stmt SEMICOLON_OP
@@ -542,36 +483,16 @@ if_stmt_sixth   ::= elif_stmt else_stmt
                     FINALLY error {:System.err.println(" Error FINALLY Stmt!! \n");:} SEMICOLON_OP
                     ;
 /*----------------------------------WHILE STATEMENT----------------------------------*/
-/*
+
   while_stmt    ::= WHILE logic_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
                     |
                     WHILE error {:System.err.println(" Error WHILE Stmt!! \n");:} SEMICOLON_OP
                     ;
-*/
-
-
-while_stmt      ::= WHILE:wh
-                    {: 
-                        Symbol symbol = new Symbol(sym.WHILE, whleft, whright, wh);
-                        SemanticActions.startWhile(symbol);
-                    :}
-                     while_stmt_sec
-                     ;
-
-
-while_stmt_sec  ::= logic_expr while_stmt_third
-                    |
-                    error {:System.err.println(" Error WHILE Stmt!! \n");:} SEMICOLON_OP
-                    ;
-
-while_stmt_third    ::= COLON_OP while_stmt_fourth;
-
-while_stmt_fourth   ::= list_loop_block_stmt SEMICOLON_OP;
 
 /*----------------------------------FOR STATEMENT----------------------------------*/
   for_stmt      ::= FOR IDENTIFIER IN range_stmt  COLON_OP list_loop_block_stmt SEMICOLON_OP
                     |
-                    FOR IDENTIFIER IN bracket_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
+                    FOR IDENTIFIER IN beacket_expr COLON_OP list_loop_block_stmt SEMICOLON_OP
                     |
                     FOR error {:System.err.println(" Error FOR Stmt!! \n");:} SEMICOLON_OP
                     ;

@@ -16,6 +16,7 @@ public class SemanticRegister {
     private String _RegisterType, _token;
     
     
+    
     public SemanticRegister(Symbol pSymbol, String pRegisterType, String pToken) {
         _SymbolObject = pSymbol;
         _RegisterType = pRegisterType;

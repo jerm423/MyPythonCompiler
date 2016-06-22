@@ -1,1 +1,0 @@
-scanner.semantic.evaluators.RWEvaluator

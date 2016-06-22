@@ -72,11 +72,11 @@ public class SemanticStack {
         }
         */
         
-        System.out.println("----Stack top---");
+        System.out.println("----Stack bottom---");
         for(int i = 0; i != _Stack.size(); i++){
             System.out.println(_Stack.get(i).getRegisterType() + " || " + _Stack.get(i).getToken());
         }
-        System.out.println("----Stack bottom---");
+        System.out.println("----Stack top---");
         System.out.println(" ");
         System.out.println(" ");
         System.out.println(" ");
